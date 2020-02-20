@@ -111,15 +111,21 @@ def preprocess(scenario):
         library_scores[library.id] = score
     # 2. 'prune' books from libraries if the book already exists in a higher score library
     best_library_for_book = {}
+    i = 0
     for book in scenario.books:
+        i += 1
+        if i % 500 == 0:
+            print("Book: " + str(book.id))
         # Get highest scoring library that contains this book
         best_score    = -1
         best_library  = None
         for candidate_library in scenario.libraries:
             candidate_score = library_scores[library.id]
-            if book in library.books and best_score < candidate_score:
+            if book in candidate_library.books and best_score < candidate_score:
                 best_score   = candidate_score
                 best_library = candidate_library
+        if best_library == None:
+            print("WARN: Could not find best library for book " + str(book.id))
         best_library_for_book[book.id] = best_library
     for library in scenario.libraries:
         library.books = list(filter(lambda book: library == best_library_for_book[book.id], library.books))
@@ -202,7 +208,8 @@ def get_file(letter):
         if name.startswith(letter + "_"):
             return "datasets/" + name
 
-INPUT_FILE = get_file("b")
+INPUT_FILE = get_file("d")
+WHOSE_WAY = "RAKA"
 
 with open(INPUT_FILE, "r") as handle:
     print("Parsing file '" + INPUT_FILE + "'...")
@@ -211,4 +218,9 @@ with open(INPUT_FILE, "r") as handle:
     print("total_books = " + str(len(scenario.books)))
     print("total_libraries = " + str(len(scenario.libraries)))
 
+    # if WHOSE_WAY == "RAKA":
+    #     preprocess(scenario)
+    #     import gannsolve
+    #     
+    # else
     solve(scenario)
