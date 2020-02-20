@@ -18,10 +18,10 @@ def train(scenario):
 
 def gen_output_file(trained_net, scenario):
     for lib in scenario.libraries:
-        score = trained_net.eval_library(lib)
+        score = trained_net.eval_library(lib, scenario.days)
         lib.gann_score = score
     
-    scenario.libaries.sort(key=operator.attrgetter('gann_score'), reverse=True)
+    scenario.libraries.sort(key=operator.attrgetter('gann_score'), reverse=True)
 
     outfile = open("gann_outfile.txt", 'w+')
     outfile.write("{0}\n".format(len(scenario.libraries)))
@@ -70,7 +70,7 @@ class GeneticAlgorithm:
             for nn_layer in nn.layers:
                 for in_node in range(nn_layer.neurons):
                     for out_node in range(nn_layer.output_neurons):
-                        nn_layer.weights[in_node][out_node] = random.random(-1,1)
+                        nn_layer.weights[in_node][out_node] = random.uniform(-1,1)
     
     @staticmethod
     def evolve(currentGen):
@@ -91,11 +91,12 @@ class NeuralNetwork:
         self.init_layers()
 
     def init_layers(self):
-        for i in range(self.topology - 1)
+        for i in range(len(self.topology) - 1):
+            layer = None
             if len(self.weights) > 0:
                 layer = NeuralLayer(self.topology[i], self.topology[i + 1], self.weights[i])
             else:
-                layer = NeuralLayer(self.topology[i], self.topology[i + 1])
+                layer = NeuralLayer(self.topology[i], self.topology[i + 1], [])
             self.layers.append(layer)
     
     def eval_library(self, library, days):
@@ -103,9 +104,9 @@ class NeuralNetwork:
         for book in library.books:
             total_sum += book.score
         
-        time_to_process = math.ceil(library.books / library.books_per_day)
+        time_to_process = math.ceil(len(library.books) / library.books_per_day)
 
-        return evaluate([total_sum, library.signup_time, time_to_process, days])
+        return self.evaluate([total_sum, library.signup_time, time_to_process, days])
 
     
     def evaluate(self, inputs):
@@ -115,26 +116,26 @@ class NeuralNetwork:
         return inputs
 
 class NeuralLayer:
-    def __init__(self, neurons, output_neurons, weights=[]):
+    def __init__(self, neurons, output_neurons, weights):
         self.neurons = neurons
         self.output_neurons = output_neurons
         self.weights = weights
-        if weights == []:
+        if len(weights) == 0:
             self.random_weights()
     
     def random_weights(self):
         for i in range(self.neurons):
-            weights.append([])
+            self.weights.append([])
             for j in range(self.output_neurons):
-                weights.append(random.random(-1,1))
+                self.weights[i].append(random.uniform(-1,1))
 
     def evaluate(self, inputs):
         outputs = [0.0] * self.output_neurons
         for i in range(self.neurons):
             for j in range(self.output_neurons):
-                outputs[i] += inputs * self.weights[i][j]
+                outputs[j] += inputs[i] * self.weights[i][j]
         
-        for i in range(outputs):
+        for i in range(len(outputs)):
             outputs[i] = math.tanh(outputs[i])
 
         return outputs

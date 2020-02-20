@@ -7,6 +7,8 @@ from os.path import isfile, join
 from objects import *
 from simulate import *
 
+days_left = -1
+
 def parse(handle):
     lines = handle.readlines()
     
@@ -208,7 +210,7 @@ def get_file(letter):
         if name.startswith(letter + "_"):
             return "datasets/" + name
 
-INPUT_FILE = get_file("d")
+INPUT_FILE = get_file("b")
 WHOSE_WAY = "RAKA"
 
 with open(INPUT_FILE, "r") as handle:
@@ -218,9 +220,10 @@ with open(INPUT_FILE, "r") as handle:
     print("total_books = " + str(len(scenario.books)))
     print("total_libraries = " + str(len(scenario.libraries)))
 
-    # if WHOSE_WAY == "RAKA":
-    #     preprocess(scenario)
-    #     import gannsolve
-    #     
-    # else
-    solve(scenario)
+    if WHOSE_WAY == "RAKA":
+        preprocess(scenario)
+        import gannsolve
+        random_nn = gannsolve.NeuralNetwork([4,8,10,4,1])
+        gannsolve.gen_output_file(random_nn, scenario)
+    else:
+        solve(scenario)
