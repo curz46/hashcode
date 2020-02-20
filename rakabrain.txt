@@ -1,0 +1,18 @@
+Pre process libraries
+	Effective inventory size of a library
+		Total books / books sent per day
+	
+	Score library
+        based on total book value and scanned per day and bias with really high scoring books
+	
+	Look at overlapping books, the library with the highest score gets the book
+
+    Re-score libraries
+        same criteria with updated book list
+    
+Determine order
+
+
+
+GANN SOLUTION
+    3 inputs - total number x
